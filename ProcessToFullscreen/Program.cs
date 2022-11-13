@@ -58,6 +58,7 @@ namespace ProcessToFullscreen
                         {
                             Fullscreen.SetForegroundWindow(process.MainWindowHandle);
                             KeyboardSend.Send(key);
+                            Thread.Sleep(100);
                             Fullscreen.SetForegroundWindow(process.MainWindowHandle);
                             screen = Screen.FromHandle(process.MainWindowHandle);
                             bool isInFullscreenCheck = Fullscreen.IsForegroundFullScreen(screen);
