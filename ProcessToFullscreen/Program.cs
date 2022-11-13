@@ -39,20 +39,32 @@ namespace ProcessToFullscreen
                             if (state != ProcessWindowStyle.Maximized)
                             {
                                 Fullscreen.MaximizeWindow(process.MainWindowHandle);
-                                processAlreadySetToMaximized.Add(process);
-                                Thread.Sleep(500);
+                                Thread.Sleep(2000);
+                                bool isMaximizedCheck = Fullscreen.GetState(process.MainWindowHandle) == ProcessWindowStyle.Maximized;
+                                if (isMaximizedCheck)
+                                {
+                                    processAlreadySetToMaximized.Add(process);
+                                }
                             }
                         }
                     }
 
                     if (keepAlwaysInFullscreen || !processAlreadySetInFullscreen.Any(p => p.Id == process.Id))
                     {
+                        Fullscreen.SetForegroundWindow(process.MainWindowHandle);
                         var screen = Screen.FromHandle(process.MainWindowHandle);
-                        if (!Fullscreen.IsForegroundFullScreen(screen))
+                        bool isFullscreen = Fullscreen.IsForegroundFullScreen(screen);
+                        if (!isFullscreen)
                         {
                             Fullscreen.SetForegroundWindow(process.MainWindowHandle);
                             KeyboardSend.Send(key);
-                            processAlreadySetInFullscreen.Add(process);
+                            Fullscreen.SetForegroundWindow(process.MainWindowHandle);
+                            screen = Screen.FromHandle(process.MainWindowHandle);
+                            bool isInFullscreenCheck = Fullscreen.IsForegroundFullScreen(screen);
+                            if (isInFullscreenCheck)
+                            {
+                                processAlreadySetInFullscreen.Add(process);
+                            }
                         }
                     }
                 }
