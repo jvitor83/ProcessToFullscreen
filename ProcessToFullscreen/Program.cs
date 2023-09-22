@@ -47,12 +47,20 @@ namespace ProcessToFullscreen
                             var state = Fullscreen.GetState(process.MainWindowHandle);
                             if (state != ProcessWindowStyle.Maximized)
                             {
-                                Fullscreen.MaximizeWindow(process.MainWindowHandle, maximizeMethod);
-                                Thread.Sleep(2000);
-                                bool isMaximizedCheck = Fullscreen.GetState(process.MainWindowHandle) == ProcessWindowStyle.Maximized;
-                                if (isMaximizedCheck)
+                                try
                                 {
-                                    processAlreadySetToMaximized.Add(process);
+                                    NativeMethods.BlockInput(true);
+                                    Fullscreen.MaximizeWindow(process.MainWindowHandle, maximizeMethod);
+                                    Thread.Sleep(2000);
+                                    bool isMaximizedCheck = Fullscreen.GetState(process.MainWindowHandle) == ProcessWindowStyle.Maximized;
+                                    if (isMaximizedCheck)
+                                    {
+                                        processAlreadySetToMaximized.Add(process);
+                                    }
+                                }
+                                finally
+                                {
+                                    NativeMethods.BlockInput(false);
                                 }
                             }
                         }
@@ -67,17 +75,26 @@ namespace ProcessToFullscreen
                             Fullscreen.SetForegroundWindow(process.MainWindowHandle);
                             var screen = Screen.FromHandle(process.MainWindowHandle);
                             bool isFullscreen = Fullscreen.IsForegroundFullScreen(screen);
+
                             if (!isFullscreen)
                             {
-                                Fullscreen.SetForegroundWindow(process.MainWindowHandle);
-                                KeyboardSend.Send(key);
-                                Thread.Sleep(100);
-                                Fullscreen.SetForegroundWindow(process.MainWindowHandle);
-                                screen = Screen.FromHandle(process.MainWindowHandle);
-                                bool isInFullscreenCheck = Fullscreen.IsForegroundFullScreen(screen);
-                                if (isInFullscreenCheck)
+                                try
                                 {
-                                    processAlreadySetInFullscreen.Add(process);
+                                    NativeMethods.BlockInput(true);
+                                    Fullscreen.SetForegroundWindow(process.MainWindowHandle);
+                                    KeyboardSend.Send(key);
+                                    Thread.Sleep(100);
+                                    Fullscreen.SetForegroundWindow(process.MainWindowHandle);
+                                    screen = Screen.FromHandle(process.MainWindowHandle);
+                                    bool isInFullscreenCheck = Fullscreen.IsForegroundFullScreen(screen);
+                                    if (isInFullscreenCheck)
+                                    {
+                                        processAlreadySetInFullscreen.Add(process);
+                                    }
+                                }
+                                finally
+                                {
+                                    NativeMethods.BlockInput(false);
                                 }
                             }
                         }

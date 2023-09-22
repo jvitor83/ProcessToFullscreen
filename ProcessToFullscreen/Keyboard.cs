@@ -7,6 +7,14 @@ using System.Threading.Tasks;
 
 namespace ProcessToFullscreen
 {
+    
+    public partial class NativeMethods
+    {
+        [DllImport("user32.dll", EntryPoint = "BlockInput")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool BlockInput([MarshalAs(UnmanagedType.Bool)] bool fBlockIt);
+    }
+
     static class KeyboardSend
     {
         [DllImport("user32.dll")]
